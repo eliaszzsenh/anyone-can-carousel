@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import {
   Slide,
   Eyebrow,
@@ -5,55 +6,48 @@ import {
   ui,
   INK,
   MUTED,
-  GRAY,
   WHITE,
   DARK,
   LINE,
   U,
   Letters,
+  useStill,
 } from "./kit";
 
-/* ANIMATION (kit cc-* entry classes; plays under .carcar-play, freezes after):
-   Order eyebrow → heading → pills → funnel draw → verdict. ≈2.4s then frozen.
-   1. Eyebrow + the two heading lines RISE in (cc-rise: y+28→0, opacity 0→1,
-      0.64s, ease out) with a small stagger (0s / 0.12s / 0.24s). The big line-2
-      ("Make you feel behind.") lands ~0.36s; its pencil <U> underline DRAWS in
-      after via --pencil-delay:1s on the heading wrapper (kit pulls the <U> paths).
-   2. The 3 grey phrase pills DROP in top→bottom (cc-drop: from y-24, 0.56s)
-      staggered --d 0.5s / 0.62s / 0.74s — they fall into the stack.
-   3. THE BEAT — convergence: the 3 hand-drawn funnel strokes DRAW in
-      (cc-pencil-stroke + ghost cc-pencil-stroke-2 in <Stroke>, stroke-dashoffset
-      1→0, --pd 0.7s) starting --pencil-delay:1.15s on the funnel wrapper, i.e.
-      just after the last pill lands, so the 3 rows visibly funnel to one mouth.
-   4. The single dark ink bar (the verdict) GROWS in (cc-grow: scaleY .04→1 from
-      top origin, 0.54s, --d 1.7s) — as if the 3 rows collapsed down into it.
-      Its label, divider + word then cc-fade in a beat later (--d 2.12s / 2.24s).
-   Elements: heading (eyebrow + 2 lines, rise+stagger) · <U> underline (draw) ·
-   3 grey pills (drop, staggered) · 3 funnel strokes + ghosts (draw) ·
-   ink bar (grow from top) · ink-bar label/word (fade). */
+/* ANIMATION (framer cascade + kit cc-* draws; plays under .carcar-play, then freezes):
+   The hype FEED that makes you feel behind, then the verdict it all funnels to.
+   1. Eyebrow + the two heading lines roll in (Letters / cc-rise). "feel behind."'s
+      pencil <U> draws after (--pencil-delay 1s).
+   2. 3 notification cards DROP in from above with a framer spring, staggered — like
+      hype notifications landing on a lock screen (icon + source tag + timestamp +
+      the hype headline).
+   3. THE BEAT — 3 hand-drawn funnel strokes DRAW in (cc-pencil-stroke, --pd 0.7s,
+      --pencil-delay 1.25s) so the 3 rows visibly funnel to one mouth.
+   4. The single dark ink bar (the verdict) GROWS in from its top edge (cc-grow,
+      --d 1.8s); its label + word fade a beat later.
+   FROZEN PATH (useStill): framer cards render at their final state (initial=false);
+   the cc-* draws show their base (final) state off the .carcar-play root. */
 
-const PHRASES = [
-  "Claude killed your job.",
-  "A new repo changes everything.",
-  "This agent is insane.",
+const FEED = [
+  { tag: "BREAKING", time: "now", text: "Claude killed your job." },
+  { tag: "TRENDING", time: "2m", text: "A new repo changes everything." },
+  { tag: "VIRAL", time: "5m", text: "This agent is insane." },
 ];
 
 export default function Slide2() {
+  const still = useStill();
   const pillW = 560;
   const funnelH = 116;
   const mouthX = pillW / 2;
   const mouthY = funnelH - 14;
 
-  // hand-drawn (imperfect, wobbly) funnel stroke from a pill edge to the mouth.
-  // mirrors the kit's PencilUnderline aesthetic: a primary wobbly path + a
-  // faint thinner ghost path beside it for the sketched, drawn-twice feel.
+  // hand-drawn (imperfect, wobbly) funnel stroke from a card edge to the mouth.
   const Stroke = ({ startX, bow }: { startX: number; bow: number }) => {
     const c1x = startX + (mouthX - startX) * 0.3 + bow;
     const c1y = funnelH * 0.34;
     const c2x = startX + (mouthX - startX) * 0.72 - bow * 0.6;
     const c2y = funnelH * 0.7;
     const d = `M${startX} 4 C ${c1x} ${c1y}, ${c2x} ${c2y}, ${mouthX} ${mouthY}`;
-    // ghost path: slightly offset, lighter, thinner (the second pencil pass)
     const dg = `M${startX + 3} 8 C ${c1x - 4} ${c1y + 3}, ${c2x + 3} ${c2y - 2}, ${mouthX + 2} ${mouthY - 2}`;
     return (
       <>
@@ -122,73 +116,120 @@ export default function Slide2() {
         </h1>
       </div>
 
-      {/* convergence composition */}
+      {/* the hype feed → funnel → verdict */}
       <div
         style={{
           position: "absolute",
           left: "50%",
           transform: "translateX(-50%)",
-          top: 438,
+          top: 446,
           width: pillW,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
         }}
       >
-        {/* 3 stacked grey phrase pills */}
-        {PHRASES.map((p, i) => (
-          <div
-            key={p}
-            className="cc-drop"
+        {/* 3 notification cards drop in from above (framer spring), staggered */}
+        {FEED.map((c, i) => (
+          <motion.div
+            key={c.text}
+            initial={still ? false : { y: -56, opacity: 0, scale: 0.96 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            transition={{
+              delay: 0.5 + i * 0.14,
+              type: "spring",
+              stiffness: 320,
+              damping: 24,
+            }}
             style={{
               width: pillW,
-              marginBottom: 16,
-              padding: "20px 30px",
-              borderRadius: 16,
-              background: GRAY,
+              marginBottom: 15,
+              padding: "17px 22px",
+              borderRadius: 18,
+              background: WHITE,
               border: `1px solid ${LINE}`,
+              boxShadow: "0 14px 34px -22px rgba(0,0,0,0.38)",
               display: "flex",
               alignItems: "center",
               gap: 16,
-              boxShadow: "0 1px 0 rgba(255,255,255,0.7) inset",
-              ["--d" as any]: `${0.5 + i * 0.12}s`,
             }}
           >
-            <span
+            <div
               style={{
-                fontFamily: ui,
-                fontSize: 14,
-                fontWeight: 700,
-                letterSpacing: "0.04em",
-                color: "rgba(29,29,31,0.32)",
-                width: 26,
+                width: 46,
+                height: 46,
+                borderRadius: 13,
+                background: INK,
                 flexShrink: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <span
-              style={{
-                fontFamily: ui,
-                fontSize: 28,
-                fontWeight: 500,
-                letterSpacing: "-0.02em",
-                color: INK,
-              }}
-            >
-              {p}
-            </span>
-          </div>
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#fff"
+                strokeWidth="2.1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span
+                  style={{
+                    fontFamily: ui,
+                    fontSize: 13,
+                    fontWeight: 800,
+                    letterSpacing: "0.12em",
+                    color: "rgba(29,29,31,0.42)",
+                  }}
+                >
+                  {c.tag}
+                </span>
+                <span
+                  style={{
+                    fontFamily: ui,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "rgba(29,29,31,0.3)",
+                    marginLeft: "auto",
+                  }}
+                >
+                  {c.time}
+                </span>
+              </div>
+              <div
+                style={{
+                  fontFamily: ui,
+                  fontSize: 27,
+                  fontWeight: 500,
+                  letterSpacing: "-0.02em",
+                  color: INK,
+                  marginTop: 3,
+                }}
+              >
+                {c.text}
+              </div>
+            </div>
+          </motion.div>
         ))}
 
-        {/* funnel — 3 BIG hand-drawn converging pencil strokes; draw AFTER pills land */}
+        {/* funnel — 3 BIG hand-drawn converging pencil strokes; draw AFTER cards land */}
         <div
           style={{
             position: "relative",
             width: pillW,
             height: funnelH,
             marginTop: 2,
-            ["--pencil-delay" as any]: "1.15s",
+            ["--pencil-delay" as any]: "1.25s",
             ["--pd" as any]: "0.7s",
           }}
         >
@@ -200,18 +241,13 @@ export default function Slide2() {
             style={{ position: "absolute", inset: 0, overflow: "visible" }}
             aria-hidden
           >
-            {/* left bows right, center wavers, right bows left — sketched funnel */}
             <Stroke startX={pillW * 0.16} bow={26} />
             <Stroke startX={pillW * 0.5} bow={-9} />
             <Stroke startX={pillW * 0.84} bow={-26} />
-
-            {/* no arrowhead — just the 3 hand-drawn funnel lines converging */}
           </svg>
         </div>
 
-        {/* single ink bar — the verdict the 3 rows collapse into.
-            GROWS from its top edge (scaleY, origin top) as if the rows
-            funneled into it; label + word fade in a beat after it settles. */}
+        {/* single ink bar — the verdict the 3 rows collapse into. */}
         <div
           className="cc-grow"
           style={{
@@ -225,7 +261,7 @@ export default function Slide2() {
             alignItems: "center",
             gap: 18,
             boxShadow: "0 30px 70px -34px rgba(0,0,0,0.55)",
-            ["--d" as any]: "1.7s",
+            ["--d" as any]: "1.8s",
           }}
         >
           <span
@@ -238,7 +274,7 @@ export default function Slide2() {
               color: "rgba(255,255,255,0.5)",
               textTransform: "uppercase",
               flexShrink: 0,
-              ["--d" as any]: "2.12s",
+              ["--d" as any]: "2.22s",
             }}
           >
             The real job
@@ -250,7 +286,7 @@ export default function Slide2() {
               height: 30,
               background: "rgba(255,255,255,0.18)",
               flexShrink: 0,
-              ["--d" as any]: "2.12s",
+              ["--d" as any]: "2.22s",
             }}
           />
           <span
@@ -261,7 +297,7 @@ export default function Slide2() {
               fontWeight: 600,
               letterSpacing: "-0.025em",
               color: WHITE,
-              ["--d" as any]: "2.24s",
+              ["--d" as any]: "2.34s",
             }}
           >
             Keep you anxious.
