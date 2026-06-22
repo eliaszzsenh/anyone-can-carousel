@@ -95,15 +95,43 @@ function Reel({ delay, w }: { delay: number; w: number }) {
           </motion.div>
         )}
       </div>
-      {/* glass sheen on the reel */}
+      {/* cylinder shading — fakes the curve of a real reel drum (FOV) so the
+          digits darken/recede toward the top + bottom edges */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           borderRadius: 14,
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0) 26%, rgba(0,0,0,0.06))",
           pointerEvents: "none",
+          background:
+            "linear-gradient(to bottom, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.10) 26%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.10) 74%, rgba(0,0,0,0.62) 100%)",
+        }}
+      />
+      {/* payline — a brighter band across the centre line, seen through glass */}
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: "50%",
+          transform: "translateY(-50%)",
+          height: WH * 0.46,
+          pointerEvents: "none",
+          background:
+            "linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.4), rgba(255,255,255,0))",
+          mixBlendMode: "overlay",
+        }}
+      />
+      {/* the GLASS in front of the reel — a diagonal gloss + edge highlights */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: 14,
+          pointerEvents: "none",
+          background:
+            "linear-gradient(122deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.12) 18%, rgba(255,255,255,0) 38%, rgba(255,255,255,0) 88%, rgba(255,255,255,0.14) 100%)",
+          boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.18)",
         }}
       />
     </div>
@@ -129,11 +157,33 @@ function SlotMachine() {
         }}
       />
 
-      {/* the lever — pulls down, springs back, triggering the spin */}
+      {/* the lever — yanks DOWN fast (velocity + motion blur), holds, springs back,
+          triggering the spin */}
       <motion.div
         initial={false}
-        animate={still ? {} : { y: [0, 52, 0] }}
-        transition={{ delay: 0.7, duration: 0.7, times: [0, 0.42, 1], ease: "easeInOut" }}
+        animate={
+          still
+            ? {}
+            : {
+                y: [0, 64, 64, 0],
+                filter: [
+                  "blur(0px)",
+                  "blur(8px)",
+                  "blur(1px)",
+                  "blur(7px)",
+                  "blur(0px)",
+                ],
+              }
+        }
+        transition={{
+          delay: 0.55,
+          y: {
+            duration: 1.0,
+            times: [0, 0.14, 0.45, 0.85],
+            ease: [0.4, 0, 0.12, 1],
+          },
+          filter: { duration: 1.0, times: [0, 0.1, 0.28, 0.62, 0.88] },
+        }}
         style={{
           position: "absolute",
           right: 0,
@@ -141,6 +191,7 @@ function SlotMachine() {
           width: 56,
           height: 210,
           zIndex: 1,
+          willChange: "transform, filter",
         }}
       >
         <div
@@ -162,7 +213,8 @@ function SlotMachine() {
             width: 44,
             height: 44,
             borderRadius: 999,
-            background: "radial-gradient(circle at 34% 30%, #ffffff, #9a9aa0 70%, #6c6c70)",
+            background:
+              "radial-gradient(circle at 34% 30%, #ffffff, #9a9aa0 70%, #6c6c70)",
             boxShadow: "0 8px 18px rgba(0,0,0,0.5)",
           }}
         />
@@ -218,7 +270,7 @@ function SlotMachine() {
               textShadow: "0 0 22px rgba(255,255,255,0.35)",
             }}
           >
-            JACKPOT
+            DAY ONE
           </div>
         </div>
 
@@ -236,9 +288,9 @@ function SlotMachine() {
             justifyContent: "center",
           }}
         >
-          <Reel delay={1.6} w={118} />
-          <Reel delay={1.95} w={118} />
-          <Reel delay={2.3} w={118} />
+          <Reel delay={1.0} w={118} />
+          <Reel delay={1.4} w={118} />
+          <Reel delay={1.8} w={118} />
         </div>
 
         {/* base: coin slot + two buttons */}
@@ -267,7 +319,8 @@ function SlotMachine() {
                 width: 32,
                 height: 32,
                 borderRadius: 999,
-                background: "radial-gradient(circle at 34% 30%, #e9e9ec, #86868b)",
+                background:
+                  "radial-gradient(circle at 34% 30%, #e9e9ec, #86868b)",
                 boxShadow: "0 4px 10px rgba(0,0,0,0.5)",
               }}
             />
@@ -282,16 +335,16 @@ export default function Slide4() {
   return (
     <Slide n={4} tone="dark">
       <style>{`
-        .carcar-play .slot-bulb{animation:slotBulb 0.7s ease-in-out infinite;animation-delay:calc(3s + var(--bd,0s));}
-        @keyframes slotBulb{0%,100%{opacity:0.32;}50%{opacity:1;}}
-        .carcar-play .slot-glow{opacity:0;animation:slotGlow 1s ease-out 2.9s forwards;}
+        .carcar-play .slot-bulb{animation:slotBulb 0.7s ease-in-out infinite;animation-delay:calc(3.7s + var(--bd,0s));}
+        @keyframes slotBulb{0%,100%{opacity:0.3;}50%{opacity:1;}}
+        .carcar-play .slot-glow{opacity:0;animation:slotGlow 1.1s ease-out 3.5s forwards;}
         @keyframes slotGlow{from{opacity:0;}to{opacity:1;}}
       `}</style>
 
       <div
         style={{
           position: "absolute",
-          top: 104,
+          top: 88,
           left: 0,
           right: 0,
           textAlign: "center",
@@ -300,7 +353,7 @@ export default function Slide4() {
         <div className="cc-fade">
           <Eyebrow text="The reframe" dark />
         </div>
-        <h1 style={{ ...head(70, true), padding: "0 110px" }}>
+        <h1 style={{ ...head(62, true), padding: "0 120px" }}>
           <Letters start={0.12} step={0.018}>
             You can't be behind in something{" "}
             <span style={{ color: INK_D }}>moving this fast.</span>
@@ -308,8 +361,8 @@ export default function Slide4() {
         </h1>
         <div
           style={{
-            ...head(62, true),
-            marginTop: 26,
+            ...head(56, true),
+            marginTop: 22,
             ["--pencil-delay" as string]: "1.15s",
           }}
         >
@@ -327,7 +380,7 @@ export default function Slide4() {
         style={
           {
             position: "absolute",
-            top: 430,
+            top: 486,
             left: "50%",
             marginLeft: -258,
             ["--fdelay" as string]: "4s",
@@ -354,7 +407,12 @@ export default function Slide4() {
       >
         <p
           className="cc-fade"
-          style={{ ...sub(27, true), ["--d" as string]: "3.4s" } as React.CSSProperties}
+          style={
+            {
+              ...sub(27, true),
+              ["--d" as string]: "3.4s",
+            } as React.CSSProperties
+          }
         >
           Every pull lands on day one. For everyone.
         </p>
