@@ -96,6 +96,8 @@ const CARCAR_ANIM_CSS = `
 .carcar-play .cc-pencil-stroke{stroke-dasharray:1;stroke-dashoffset:1;animation:ccDraw var(--pd,.6s) var(--eo) var(--pencil-delay,.5s) both;}
 .carcar-play .cc-pencil-stroke-2{stroke-dasharray:1;stroke-dashoffset:1;animation:ccDraw var(--pd,.6s) var(--eo) calc(var(--pencil-delay,.5s) + .12s) both;}
 .carcar-play .cc-letter{display:inline-block;animation:ccLetter .6s var(--eo) var(--d,0s) both;will-change:transform,filter,opacity;}
+.carcar-play .cc-float{animation:ccFloat var(--fdur,5s) ease-in-out var(--fdelay,1.4s) infinite;will-change:transform;}
+.carcar-play .cc-breath{animation:ccBreath var(--bdur,5.5s) ease-in-out var(--bdelay,1.6s) infinite;will-change:transform;}
 @keyframes ccRise{from{opacity:0;transform:translateY(22px);filter:blur(7px);}55%{opacity:1;filter:blur(.4px);}to{opacity:1;transform:none;filter:blur(0);}}
 @keyframes ccRiseSm{from{opacity:0;transform:translateY(13px);filter:blur(5px);}to{opacity:1;transform:none;filter:blur(0);}}
 @keyframes ccFade{from{opacity:0;filter:blur(6px);}to{opacity:1;filter:blur(0);}}
@@ -104,8 +106,10 @@ const CARCAR_ANIM_CSS = `
 @keyframes ccGrow{from{opacity:0;transform:scaleY(.04);filter:blur(5px);}to{opacity:1;transform:scaleY(1);filter:blur(0);}}
 @keyframes ccDraw{0%{opacity:0;stroke-dashoffset:1;}12%{opacity:var(--so,1);}100%{opacity:var(--so,1);stroke-dashoffset:0;}}
 @keyframes ccLetter{from{opacity:0;transform:translateY(0.42em);filter:blur(7px);}to{opacity:1;transform:translateY(0);filter:blur(0);}}
+@keyframes ccFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+@keyframes ccBreath{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
 @media (prefers-reduced-motion: reduce){
-.carcar-play .cc-rise,.carcar-play .cc-rise-sm,.carcar-play .cc-fade,.carcar-play .cc-pop,.carcar-play .cc-drop,.carcar-play .cc-grow,.carcar-play .cc-pencil-stroke,.carcar-play .cc-pencil-stroke-2,.carcar-play .cc-letter{animation:none!important;opacity:1!important;transform:none!important;filter:none!important;stroke-dashoffset:0!important;}
+.carcar-play .cc-rise,.carcar-play .cc-rise-sm,.carcar-play .cc-fade,.carcar-play .cc-pop,.carcar-play .cc-drop,.carcar-play .cc-grow,.carcar-play .cc-pencil-stroke,.carcar-play .cc-pencil-stroke-2,.carcar-play .cc-letter,.carcar-play .cc-float,.carcar-play .cc-breath{animation:none!important;opacity:1!important;transform:none!important;filter:none!important;stroke-dashoffset:0!important;}
 }
 `;
 
@@ -283,7 +287,7 @@ export function Slide({
             infinite loops (card float / sheen / CTA pulse) during capture only —
             the live page (and the record view) keep the bounce. */}
         {cap && (
-          <style>{`.rmp-cardfloat,.rmp-card-sheen,.cc1-cta-pulse{animation:none!important;}`}</style>
+          <style>{`.rmp-cardfloat,.rmp-card-sheen,.cc1-cta-pulse,.cc-float,.cc-breath{animation:none!important;}`}</style>
         )}
         {/* keyed wrapper restarts CSS animations on each entry; opacity keeps the
             content hidden while armed so the pre-play / reset is never visible. */}

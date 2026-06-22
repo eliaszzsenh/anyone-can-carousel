@@ -67,12 +67,15 @@ export default function Slide7() {
               Sequence: the PencilCircle loops in first (--pencil-delay on this
               wrapper drives its strokes), then the checkmark ticks inside it. */}
           <div
+            className="cc-float"
             style={{
               position: "relative",
               width: 156,
               height: 156,
               // the circle gesture lands first
               ["--pencil-delay" as any]: "0.95s",
+              ["--fdelay" as any]: "2.2s",
+              ["--fdur" as any]: "4.8s",
             }}
           >
             <svg

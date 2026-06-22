@@ -59,14 +59,19 @@ export default function Slide4() {
       {/* the starting GRID — everyone lined up at the same start; the lanes (the
           road ahead) stretch out empty, so nobody is ahead. */}
       <div
-        style={{
-          position: "absolute",
-          top: 612,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: 720,
-          height: 250,
-        }}
+        className="cc-float"
+        style={
+          {
+            position: "absolute",
+            top: 612,
+            left: "50%",
+            marginLeft: -360,
+            width: 720,
+            height: 250,
+            "--fdelay": "2.6s",
+            "--fdur": "5.5s",
+          } as React.CSSProperties
+        }
       >
         {/* lanes — the open road ahead, fading into the distance (empty) */}
         {[0, 1, 2, 3, 4].map((i) => (

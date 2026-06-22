@@ -34,34 +34,44 @@ export default function Slide8() {
         {/* personal sign-off — circular photo, framed by a hand-drawn pencil
             circle that draws itself in (the "encadrement" around the cut-out). */}
         <div
-          className="cc-pop"
+          className="cc-float"
           style={
             {
-              position: "relative",
-              width: 156,
-              height: 156,
               marginBottom: 34,
-              // pops in after the headline rolls + around the CTA (not first, not
-              // dead-last), then the pencil ring scribbles around it.
-              "--d": "1.35s",
-              "--pencil-delay": "1.8s",
+              "--fdelay": "3s",
+              "--fdur": "4.6s",
             } as React.CSSProperties
           }
         >
-          <img
-            src="/profile.jpg"
-            alt="Your name"
-            style={{
-              width: 156,
-              height: 156,
-              borderRadius: "50%",
-              objectFit: "cover",
-              objectPosition: "center 32%",
-              display: "block",
-              border: "1px solid rgba(0,0,0,0.08)",
-            }}
-          />
-          <PencilCircle color={INK} size={290} />
+          <div
+            className="cc-pop"
+            style={
+              {
+                position: "relative",
+                width: 156,
+                height: 156,
+                // pops in after the headline rolls + around the CTA (not first, not
+                // dead-last), then the pencil ring scribbles around it.
+                "--d": "1.35s",
+                "--pencil-delay": "1.8s",
+              } as React.CSSProperties
+            }
+          >
+            <img
+              src="/profile.jpg"
+              alt="Your name"
+              style={{
+                width: 156,
+                height: 156,
+                borderRadius: "50%",
+                objectFit: "cover",
+                objectPosition: "center 32%",
+                display: "block",
+                border: "1px solid rgba(0,0,0,0.08)",
+              }}
+            />
+            <PencilCircle color={INK} size={290} />
+          </div>
         </div>
         <div className="cc-rise" style={{ "--d": "0s" } as React.CSSProperties}>
           <Eyebrow text="Want all of it?" />

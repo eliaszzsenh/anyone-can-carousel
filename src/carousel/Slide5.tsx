@@ -87,16 +87,21 @@ function Glyph({ i }: { i: number }) {
 
 const oneTile = (
   <div
-    style={{
-      width: ONE,
-      height: ONE,
-      borderRadius: 34,
-      background: INK,
-      boxShadow: "0 30px 60px -26px rgba(0,0,0,0.55)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}
+    className="cc-float"
+    style={
+      {
+        "--fdelay": "2.4s",
+        "--fdur": "4.5s",
+        width: ONE,
+        height: ONE,
+        borderRadius: 34,
+        background: INK,
+        boxShadow: "0 30px 60px -26px rgba(0,0,0,0.55)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      } as React.CSSProperties
+    }
   >
     <svg width="82" height="82" viewBox="0 -.01 39.5 39.53" aria-hidden>
       <path

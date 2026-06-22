@@ -94,7 +94,17 @@ export default function Slide3() {
       </div>
 
       <Center pad={0}>
-        <div style={{ position: "relative", marginTop: 188 }}>
+        <div
+          className="cc-float"
+          style={
+            {
+              position: "relative",
+              marginTop: 188,
+              "--fdelay": "2.7s",
+              "--fdur": "6s",
+            } as React.CSSProperties
+          }
+        >
           <GridField />
 
           {/* hand-drawn pencil circle around the ink cluster — someone circling

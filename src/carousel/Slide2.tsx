@@ -122,7 +122,7 @@ export default function Slide2() {
           position: "absolute",
           left: "50%",
           transform: "translateX(-50%)",
-          top: 446,
+          top: 408,
           width: pillW,
           display: "flex",
           flexDirection: "column",
@@ -141,82 +141,92 @@ export default function Slide2() {
               stiffness: 320,
               damping: 24,
             }}
-            style={{
-              width: pillW,
-              marginBottom: 15,
-              padding: "17px 22px",
-              borderRadius: 18,
-              background: WHITE,
-              border: `1px solid ${LINE}`,
-              boxShadow: "0 14px 34px -22px rgba(0,0,0,0.38)",
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-            }}
+            style={{ width: pillW, marginBottom: 15 }}
           >
+            {/* inner wrapper carries the perpetual idle bob (staggered per card) so
+                it never fights framer's drop-in transform on the outer element */}
             <div
-              style={{
-                width: 46,
-                height: 46,
-                borderRadius: 13,
-                background: INK,
-                flexShrink: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="cc-float"
+              style={
+                {
+                  "--fdelay": `${1.5 + i * 0.25}s`,
+                  "--fdur": "4.6s",
+                  width: pillW,
+                  padding: "17px 22px",
+                  borderRadius: 18,
+                  background: WHITE,
+                  border: `1px solid ${LINE}`,
+                  boxShadow: "0 14px 34px -22px rgba(0,0,0,0.38)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 16,
+                } as React.CSSProperties
+              }
             >
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#fff"
-                strokeWidth="2.1"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span
-                  style={{
-                    fontFamily: ui,
-                    fontSize: 13,
-                    fontWeight: 800,
-                    letterSpacing: "0.12em",
-                    color: "rgba(29,29,31,0.42)",
-                  }}
-                >
-                  {c.tag}
-                </span>
-                <span
-                  style={{
-                    fontFamily: ui,
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: "rgba(29,29,31,0.3)",
-                    marginLeft: "auto",
-                  }}
-                >
-                  {c.time}
-                </span>
-              </div>
               <div
                 style={{
-                  fontFamily: ui,
-                  fontSize: 27,
-                  fontWeight: 500,
-                  letterSpacing: "-0.02em",
-                  color: INK,
-                  marginTop: 3,
+                  width: 46,
+                  height: 46,
+                  borderRadius: 13,
+                  background: INK,
+                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                {c.text}
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#fff"
+                  strokeWidth="2.1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span
+                    style={{
+                      fontFamily: ui,
+                      fontSize: 13,
+                      fontWeight: 800,
+                      letterSpacing: "0.12em",
+                      color: "rgba(29,29,31,0.42)",
+                    }}
+                  >
+                    {c.tag}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: ui,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: "rgba(29,29,31,0.3)",
+                      marginLeft: "auto",
+                    }}
+                  >
+                    {c.time}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    fontFamily: ui,
+                    fontSize: 27,
+                    fontWeight: 500,
+                    letterSpacing: "-0.02em",
+                    color: INK,
+                    marginTop: 3,
+                  }}
+                >
+                  {c.text}
+                </div>
               </div>
             </div>
           </motion.div>
