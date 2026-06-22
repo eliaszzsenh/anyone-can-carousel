@@ -25,7 +25,8 @@ const slides = [
 
 const FONT = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif";
 const INK = "#1d1d1f";
-const REC_BLACK_MS = 1500;
+const REC_BLACK_MS = 1500; // black hold before the slide plays
+const REC_PLAY_MS = 10000; // how long it plays before going black again
 
 export default function App() {
   const [view, setView] = useState<"slides" | "record">("slides");
@@ -77,12 +78,19 @@ export default function App() {
       /* noop */
     }
     if (!recActive) return;
+    // black START → play → black END: clean black bookends to cut between.
     setRecBlack(true);
-    const t = setTimeout(() => {
+    const t1 = setTimeout(() => {
       setRecBlack(false);
       window.dispatchEvent(new Event("ccplay"));
     }, REC_BLACK_MS);
-    return () => clearTimeout(t);
+    const t2 = setTimeout(() => {
+      setRecBlack(true);
+    }, REC_BLACK_MS + REC_PLAY_MS);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [recCur, recActive, recTake]);
 
   // arrows switch slides, Esc exits.
@@ -193,8 +201,8 @@ export default function App() {
             pointerEvents: "none",
           }}
         >
-          slide {(recCur as number) + 1} / {slides.length} · 1.5s black, then it
-          plays once · ← / → switch · click to re-take · F11 fullscreen · Esc to exit
+          slide {(recCur as number) + 1} / {slides.length} · black → plays ~10s →
+          black · ← / → switch · click to re-take · F11 fullscreen · Esc to exit
         </div>
       </div>
     );

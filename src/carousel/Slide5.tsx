@@ -155,7 +155,7 @@ function ToolConverge() {
       >
         <div style={center}>{oneTile}</div>
         <div style={{ position: "absolute", left: "50%", top: "50%" }}>
-          <PencilCircle color={INK} size={560} />
+          <PencilCircle color={INK} size={680} />
         </div>
       </div>
     );
@@ -294,7 +294,7 @@ export default function Slide5() {
             left: 0,
             right: 0,
             textAlign: "center",
-            "--d": "2.7s",
+            "--d": "3.4s",
           } as React.CSSProperties
         }
       >
