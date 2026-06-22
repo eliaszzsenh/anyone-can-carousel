@@ -155,7 +155,7 @@ function ToolConverge() {
       >
         <div style={center}>{oneTile}</div>
         <div style={{ position: "absolute", left: "50%", top: "50%" }}>
-          <PencilCircle color={INK} size={680} />
+          <PencilCircle color={INK} size={470} />
         </div>
       </div>
     );
@@ -212,7 +212,7 @@ function ToolConverge() {
       </motion.div>
 
       <div style={{ position: "absolute", left: "50%", top: "50%" }}>
-        <PencilCircle color={INK} size={680} />
+        <PencilCircle color={INK} size={470} />
       </div>
     </div>
   );
@@ -229,8 +229,8 @@ export default function Slide5() {
             left: 0,
             right: 0,
             textAlign: "center",
-            // the "one" underline draws LATE — after the convergence + circle land
-            "--pencil-delay": "4.4s",
+            // the "one" underline draws after the convergence + circle land
+            "--pencil-delay": "2.7s",
           } as React.CSSProperties
         }
       >
