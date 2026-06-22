@@ -212,7 +212,7 @@ function ToolConverge() {
       </motion.div>
 
       <div style={{ position: "absolute", left: "50%", top: "50%" }}>
-        <PencilCircle color={INK} size={300} />
+        <PencilCircle color={INK} size={680} />
       </div>
     </div>
   );
@@ -229,8 +229,8 @@ export default function Slide5() {
             left: 0,
             right: 0,
             textAlign: "center",
-            // the "one" underline draws right after the emphasis line pops in
-            "--pencil-delay": "1.25s",
+            // the "one" underline draws LATE — after the convergence + circle land
+            "--pencil-delay": "4.4s",
           } as React.CSSProperties
         }
       >
