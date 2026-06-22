@@ -155,7 +155,7 @@ function ToolConverge() {
       >
         <div style={center}>{oneTile}</div>
         <div style={{ position: "absolute", left: "50%", top: "50%" }}>
-          <PencilCircle color={INK} size={384} />
+          <PencilCircle color={INK} size={560} />
         </div>
       </div>
     );
