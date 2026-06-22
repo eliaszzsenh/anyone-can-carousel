@@ -1,31 +1,22 @@
 import { Slide, Eyebrow, head, sub, ui, INK_D, U, Letters } from "./kit";
 
-/* ANIMATION (play-then-freeze — the calm REFRAME breath):
+/* ANIMATION (play-then-freeze — the calm REFRAME):
    1. Eyebrow + headline roll in (Letters). "Nobody's ahead." rises a beat later;
       its WHITE pencil <U> draws after it lands.
-   2. THE VISUAL — a race START: the bold start line draws top→bottom (~0.95s); the
-      5 lanes (the open road AHEAD) draw out left→right, staggered, then begin to
-      FLOW (dashed road markings stream rightward forever — time moving, but you're
-      still at the line). 5 runner avatars pop onto the start line, ALL level; ONE
-      is YOU. "DAY 1" marks the line. The whole grid idles with a slow float.
-   3. Bottom body line fades in last. Freeze.
-   Frozen base = full lines + avatars present (.carcar-play scoping keeps stills
-   static; the flow/float only run live). */
-
-const LANES = [0, 1, 2, 3, 4];
-const YOU = 2;
+   2. THE VISUAL — ONE idea, not a busy diagram: a "how caught up you are" meter.
+      The fill climbs toward "caught up", then SNAPS back to zero (a new thing
+      dropped) and climbs again, forever. The leading marker (you) rides it and
+      gets reset every cycle. You never reach 100, so nobody pulls ahead.
+   3. Bottom line fades in last. Freeze.
+   FROZEN (useStill): the fill rests at a partial width (the .carcar-play scoping
+   stops the loop), reading as "in progress, never done". */
 
 export default function Slide4() {
   return (
     <Slide n={4} tone="dark">
       <style>{`
-        .carcar-play .s4-start{transform-origin:top center;animation:s4StartDraw .55s var(--eo) .95s both;}
-        @keyframes s4StartDraw{from{transform:scaleY(0);}to{transform:scaleY(1);}}
-        .carcar-play .s4-lane{transform-origin:left center;animation:s4LaneDraw .62s var(--eo) var(--d,1s) both, s4Flow 1.1s linear 1.9s infinite;}
-        @keyframes s4LaneDraw{from{transform:scaleX(0);opacity:0;}to{transform:scaleX(1);opacity:1;}}
-        @keyframes s4Flow{from{background-position:0 0;}to{background-position:40px 0;}}
-        .carcar-play .s4-label{animation:s4LabelUp .6s var(--eo) var(--d,0s) both;}
-        @keyframes s4LabelUp{from{opacity:0;transform:translate(-50%,8px);}to{opacity:1;transform:translate(-50%,0);}}
+        .carcar-play .s4-fill{animation:s4Fill 4.2s cubic-bezier(.5,0,.2,1) 1.5s infinite;}
+        @keyframes s4Fill{0%{width:6%}60%{width:84%}67%{width:84%}71%{width:6%}100%{width:6%}}
       `}</style>
 
       <div
@@ -61,134 +52,112 @@ export default function Slide4() {
         </div>
       </div>
 
-      {/* the starting line — everyone level; the road ahead flows on, empty */}
+      {/* the "caught up" meter — fills, then resets to zero forever */}
       <div
         className="cc-float"
         style={
           {
             position: "absolute",
-            top: 600,
+            top: 648,
             left: "50%",
-            marginLeft: -360,
-            width: 720,
-            height: 250,
-            "--fdelay": "2.6s",
-            "--fdur": "5.5s",
+            marginLeft: -330,
+            width: 660,
+            "--fdelay": "2.4s",
+            "--fdur": "5.6s",
           } as React.CSSProperties
         }
       >
-        {/* lanes — dashed road markings that draw in then FLOW right, fading away */}
-        {LANES.map((i) => (
+        <div
+          className="cc-fade"
+          style={{ ["--d" as string]: "0.7s" } as React.CSSProperties}
+        >
+          {/* label row */}
           <div
-            key={"lane" + i}
-            className="s4-lane"
-            style={
-              {
-                position: "absolute",
-                left: 78,
-                top: 22 + i * 46,
-                width: 618,
-                height: 3,
-                background:
-                  "repeating-linear-gradient(to right, rgba(245,245,247,0.6) 0 14px, rgba(245,245,247,0) 14px 40px)",
-                WebkitMaskImage:
-                  "linear-gradient(to right, #000 0%, #000 24%, transparent 100%)",
-                maskImage:
-                  "linear-gradient(to right, #000 0%, #000 24%, transparent 100%)",
-                transformOrigin: "left center",
-                "--d": `${1.05 + i * 0.08}s`,
-              } as React.CSSProperties
-            }
-          />
-        ))}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+              marginBottom: 18,
+            }}
+          >
+            <span
+              style={{
+                ...sub(27, true),
+                color: "rgba(245,245,247,0.9)",
+                fontWeight: 600,
+              }}
+            >
+              How caught up you are
+            </span>
+            <span
+              style={{
+                fontFamily: ui,
+                fontSize: 20,
+                fontWeight: 700,
+                letterSpacing: "0.04em",
+                color: "rgba(245,245,247,0.5)",
+              }}
+            >
+              resets daily ↺
+            </span>
+          </div>
 
-        {/* the START line — bold; everyone is AT it */}
-        <div
-          className="s4-start"
-          style={{
-            position: "absolute",
-            left: 74,
-            top: 8,
-            width: 4,
-            height: 212,
-            background: "rgba(245,245,247,0.95)",
-            borderRadius: 2,
-            boxShadow: "0 0 18px 3px rgba(245,245,247,0.22)",
-          }}
-        />
-
-        {/* runners — one per lane, ALL on the start line; one is YOU */}
-        {LANES.map((i) => {
-          const you = i === YOU;
-          const sz = you ? 30 : 19;
-          return (
+          {/* track + fill + leading marker (you) */}
+          <div
+            style={{
+              position: "relative",
+              width: 660,
+              height: 28,
+              borderRadius: 999,
+              background: "rgba(245,245,247,0.10)",
+              border: "1px solid rgba(245,245,247,0.18)",
+            }}
+          >
             <div
-              key={"run" + i}
-              className="cc-pop"
-              style={
-                {
+              className="s4-fill"
+              style={{
+                position: "absolute",
+                left: 0,
+                top: -1,
+                bottom: -1,
+                width: "42%",
+                borderRadius: 999,
+                background: "#fff",
+                boxShadow: "0 0 20px 2px rgba(245,245,247,0.28)",
+              }}
+            >
+              <div
+                style={{
                   position: "absolute",
-                  left: 74 - sz / 2,
-                  top: 23 + i * 46 - sz / 2,
-                  width: sz,
-                  height: sz,
+                  right: -7,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: 26,
+                  height: 26,
                   borderRadius: 999,
-                  background: you ? "#fff" : "rgba(245,245,247,0.12)",
-                  border: you ? "none" : "2px solid rgba(245,245,247,0.72)",
-                  boxShadow: you
-                    ? "0 0 0 7px rgba(245,245,247,0.14), 0 8px 20px rgba(0,0,0,0.45)"
-                    : "none",
-                  "--d": `${1.5 + i * 0.09}s`,
-                } as React.CSSProperties
-              }
-            />
-          );
-        })}
+                  background: "#fff",
+                  boxShadow:
+                    "0 0 0 7px rgba(245,245,247,0.14), 0 6px 16px rgba(0,0,0,0.45)",
+                }}
+              />
+            </div>
+          </div>
 
-        {/* "you" tag above the highlighted runner */}
-        <div
-          className="s4-label"
-          style={
-            {
-              position: "absolute",
-              left: 74,
-              top: 23 + YOU * 46 - 44,
-              transform: "translateX(-50%)",
+          {/* scale ends */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: 14,
               fontFamily: ui,
-              fontSize: 18,
-              fontWeight: 700,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              color: "#fff",
-              whiteSpace: "nowrap",
-              "--d": "2.1s",
-            } as React.CSSProperties
-          }
-        >
-          you
-        </div>
-
-        {/* DAY 1 — marks the start line */}
-        <div
-          className="s4-label"
-          style={
-            {
-              position: "absolute",
-              left: 74,
-              top: 238,
-              transform: "translateX(-50%)",
-              fontFamily: ui,
-              fontSize: 24,
-              fontWeight: 700,
-              letterSpacing: "0.24em",
-              textTransform: "uppercase",
-              color: "rgba(245,245,247,0.6)",
-              whiteSpace: "nowrap",
-              "--d": "2.2s",
-            } as React.CSSProperties
-          }
-        >
-          Day 1
+              fontSize: 19,
+              fontWeight: 600,
+              color: "rgba(245,245,247,0.4)",
+            }}
+          >
+            <span>Day 1</span>
+            <span>caught up</span>
+          </div>
         </div>
       </div>
 
@@ -205,11 +174,11 @@ export default function Slide4() {
           className="cc-fade"
           style={{
             ...sub(28, true),
-            padding: "0 160px",
+            padding: "0 150px",
             ["--d" as string]: "2.4s",
           }}
         >
-          Everyone is standing at the same starting line.
+          It resets faster than anyone can get ahead.
         </p>
       </div>
     </Slide>
