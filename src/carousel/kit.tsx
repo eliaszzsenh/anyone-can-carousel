@@ -106,8 +106,8 @@ const CARCAR_ANIM_CSS = `
 @keyframes ccGrow{from{opacity:0;transform:scaleY(.04);filter:blur(5px);}to{opacity:1;transform:scaleY(1);filter:blur(0);}}
 @keyframes ccDraw{0%{opacity:0;stroke-dashoffset:1;}12%{opacity:var(--so,1);}100%{opacity:var(--so,1);stroke-dashoffset:0;}}
 @keyframes ccLetter{from{opacity:0;transform:translateY(0.42em);filter:blur(7px);}to{opacity:1;transform:translateY(0);filter:blur(0);}}
-@keyframes ccFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
-@keyframes ccBreath{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
+@keyframes ccFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+@keyframes ccBreath{0%,100%{transform:scale(1);}50%{transform:scale(1.055);}}
 @media (prefers-reduced-motion: reduce){
 .carcar-play .cc-rise,.carcar-play .cc-rise-sm,.carcar-play .cc-fade,.carcar-play .cc-pop,.carcar-play .cc-drop,.carcar-play .cc-grow,.carcar-play .cc-pencil-stroke,.carcar-play .cc-pencil-stroke-2,.carcar-play .cc-letter,.carcar-play .cc-float,.carcar-play .cc-breath{animation:none!important;opacity:1!important;transform:none!important;filter:none!important;stroke-dashoffset:0!important;}
 }

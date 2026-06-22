@@ -70,8 +70,8 @@ export default function Slide7() {
             className="cc-float"
             style={{
               position: "relative",
-              width: 156,
-              height: 156,
+              width: 210,
+              height: 210,
               // the circle gesture lands first
               ["--pencil-delay" as any]: "0.95s",
               ["--fdelay" as any]: "2.2s",
@@ -79,8 +79,8 @@ export default function Slide7() {
             }}
           >
             <svg
-              width="156"
-              height="156"
+              width="210"
+              height="210"
               viewBox="0 0 156 156"
               fill="none"
               style={{
@@ -100,7 +100,7 @@ export default function Slide7() {
                 strokeLinejoin="round"
               />
             </svg>
-            <PencilCircle color={INK} size={156} />
+            <PencilCircle color={INK} size={210} />
           </div>
 
           {/* emphasis line — "you" is oversized + extreme hand-drawn underline.
@@ -108,7 +108,7 @@ export default function Slide7() {
           <div
             className="cc-fade"
             style={{
-              marginTop: 56,
+              marginTop: 96,
               display: "flex",
               alignItems: "baseline",
               justifyContent: "center",
