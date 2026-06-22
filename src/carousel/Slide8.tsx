@@ -64,7 +64,7 @@ export default function Slide8() {
           <PencilCircle color={INK} size={290} />
         </div>
         <div className="cc-rise" style={{ "--d": "0s" } as React.CSSProperties}>
-          <Eyebrow text="Want my exact setup?" />
+          <Eyebrow text="Want all of it?" />
         </div>
 
         <h1
@@ -92,7 +92,7 @@ export default function Slide8() {
             } as React.CSSProperties
           }
         >
-          The one tool, the skills I install, and how I actually prompt it.
+          My exact setup, the agent, the prompts, AND how I made this carousel.
         </p>
 
         {/* ── Comment-to-DM CTA (primary action) ── */}
@@ -226,7 +226,7 @@ export default function Slide8() {
             </div>
           </div>
           <p style={{ ...sub(28), maxWidth: 640 }}>
-            and I&rsquo;ll DM you the exact setup, free.
+            and I&rsquo;ll DM you my setup + how I built this reel, free.
           </p>
         </div>
       </Center>
@@ -251,7 +251,7 @@ export default function Slide8() {
         </span>
         <span style={{ width: 1, height: 16, background: LINE }} />
         <span style={{ fontSize: 25, fontWeight: 500, color: MUTED }}>
-          tomorrow: how I made this carousel
+          I share everything I build
         </span>
       </div>
 

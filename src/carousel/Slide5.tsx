@@ -1,299 +1,217 @@
-import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import {
   Slide,
-  Center,
   Eyebrow,
   head,
   sub,
-  ui,
   INK,
   MUTED,
-  GRAY,
   LINE,
+  WHITE,
   U,
   Letters,
   PencilCircle,
-  EASE,
   useStill,
-  useCarcarPlay,
 } from "./kit";
 
-/* ANIMATION (play-then-freeze; total entry ≈ 2.6s then FREEZE):
-   This is the PAYOFF slide of the value arc, so the ONE square earns a bigger
-   moment than slide 3's cluster. Order:
-   1. Eyebrow + headline rise (cc-rise). "50 tools." is muted. The oversized
-      "one" gets its own beat — wrapped in a plain inline-block that cc-pop's in
-      (overshoot), and its thick <U> underline DRAWS right after via
-      {"--pencil-delay"} on the heading block.
-   2. SquareField (JS child, WAAPI, gated on useStill): the 50 squares WAVE in on
-      a diagonal stagger (scale .4→1 + opacity, ~.85s, pop ease), then ONE soft
-      shimmer/twinkle pass (~.4s, faint brightness lift) so the field feels alive.
-   3. RESOLVE: the 49 non-chosen squares settle to faint (opacity→.55) while the
-      ONE ink square holds and SCALES UP confidently (1→1 with an overshoot to
-      ~1.14 then settle to 1 — the payoff beat), giving it more emphasis.
-   4. THEN the two stacked PencilCircle loops draw around the one square
-      ({"--pencil-delay"} on their overlay wrapper, ~1.95s) reading as a hand
-      scribbling a circle ~2–3 times around it.
-   5. The "one." label + its hand-drawn connector tick fade/rise in LAST
-      (cc-fade / cc-rise-sm, ~2.25s).
-   FROZEN PATH (useStill): SquareField renders every square at its FINAL state
-   immediately (49 faint, 1 solid ink, full size) — no WAAPI, no flash. Pencil
-   marks render solid (the kit's draw CSS is absent off the .carcar-play root).
-   Final frozen state is IDENTICAL to the original design. */
+/* ANIMATION (play-then-freeze; total entry ≈ 2.8s then FREEZE):
+   The PAYOFF of the value arc — and DELIBERATELY not a grid (slide 3 owns the
+   grid). The metaphor is convergence: a scattered clutter of mismatched "tools"
+   collapses into the ONE.
+   1. Eyebrow fades; headline rolls in per-letter (Letters). "50 tools." is muted.
+      "You need" rolls, then the oversized "one" POPS (cc-pop) and its thick <U>
+      underline draws (--pencil-delay on the heading block).
+   2. ToolConverge (framer): ~11 tool tiles fade in SCATTERED + tilted, hold a beat
+      (the clutter), then all sweep INTO the centre and vanish (the "50" collapsing).
+   3. As they merge, the ONE solid ink tile springs up at the centre.
+   4. The hand-drawn PencilCircle scribbles around it (--pencil-delay ~2.1s).
+   5. The bottom body line rises in last (cc-rise-sm).
+   FROZEN PATH (useStill): ToolConverge renders ONLY the final state — the one ink
+   tile + the circle — no scattered tiles, no motion. */
 
-const COLS = 10;
-const ROWS = 5;
-const TOTAL = COLS * ROWS;
-const CELL = 56; // square size
-const GAP = 18;
-const CHOSEN = 24; // index of the one solid square (row 2, col 4) — near centre
+const TILE = 104;
+const ONE = 150;
 
-// choreography timing (seconds) — referenced by both the JS field + pencil delays
-const WAVE_START = 0.55; // squares begin waving in after the heading lands
-const WAVE_STEP = 0.022; // per-diagonal stagger
-const WAVE_DUR = 0.5; // each square's pop-in duration
-const RESOLVE_AT = 1.35; // when the 49 fade to faint + the ONE scales up
-const PENCIL_AT = 1.95; // when the hand-circle starts drawing (after the one settles)
-const LABEL_AT = 2.25; // when the "one." label + connector arrive
+// scattered "tools": varied offsets + tilts around the centre. They all converge.
+const SCATTER: { x: number; y: number; r: number }[] = [
+  { x: -316, y: -96, r: -12 },
+  { x: 306, y: -120, r: 10 },
+  { x: -252, y: 84, r: 7 },
+  { x: 268, y: 104, r: -8 },
+  { x: -128, y: -176, r: -6 },
+  { x: 152, y: -182, r: 8 },
+  { x: -12, y: 182, r: -5 },
+  { x: -332, y: 8, r: 6 },
+  { x: 324, y: 4, r: -7 },
+  { x: 150, y: 180, r: 9 },
+  { x: -182, y: 168, r: -9 },
+];
 
-function SquareField() {
-  const still = useStill();
-  const play = useCarcarPlay();
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (still || !play) return; // frozen, or not yet on-screen — no motion
-    const root = ref.current;
-    if (!root) return;
-    const cells = Array.from(root.querySelectorAll<HTMLElement>("[data-sq]"));
-
-    // focus-pull: the field comes INTO focus as it lands (motion-blur feel)
-    root.animate([{ filter: "blur(11px)" }, { filter: "blur(0px)" }], {
-      duration: 820,
-      easing: EASE.out,
-      fill: "both",
-    });
-
-    cells.forEach((el) => {
-      const i = Number(el.dataset.sq);
-      const isOne = i === CHOSEN;
-      const col = i % COLS;
-      const row = Math.floor(i / COLS);
-      // diagonal stagger: top-left first, bottom-right last
-      const delay = WAVE_START + (col + row) * WAVE_STEP;
-
-      // 1) WAVE IN — pop from small + transparent to full size.
-      el.animate(
-        [
-          { opacity: 0, transform: "scale(0.4)", offset: 0 },
-          { opacity: 1, transform: "scale(1.06)", offset: 0.7 },
-          { opacity: 1, transform: "scale(1)", offset: 1 },
-        ],
-        {
-          duration: WAVE_DUR * 1000,
-          delay: delay * 1000,
-          easing: EASE.pop,
-          fill: "forwards",
-        },
-      );
-
-      // 2) SHIMMER — a single soft twinkle pass across the whole field, right
-      //    after the wave lands. A gentle brightness lift, diagonal sweep.
-      const shimmerAt = WAVE_START + 0.55 + (col + row) * 0.012;
-      el.animate(
-        [
-          { filter: "brightness(1)", offset: 0 },
-          { filter: "brightness(1.35)", offset: 0.5 },
-          { filter: "brightness(1)", offset: 1 },
-        ],
-        {
-          duration: 420,
-          delay: shimmerAt * 1000,
-          easing: "ease-in-out",
-          fill: "none",
-        },
-      );
-
-      // 3) RESOLVE — the 49 fade to faint; the ONE holds + scales up confidently.
-      const inner = el.querySelector<HTMLElement>("[data-box]");
-      if (isOne) {
-        // the payoff beat: overshoot then settle, a touch more than a cluster.
-        inner?.animate(
-          [
-            { transform: "scale(1)", offset: 0 },
-            { transform: "scale(1.16)", offset: 0.5 },
-            { transform: "scale(1)", offset: 1 },
-          ],
-          {
-            duration: 620,
-            delay: RESOLVE_AT * 1000,
-            easing: EASE.pop,
-            fill: "forwards",
-          },
-        );
-      } else {
-        // settle from the bright wave-in (opacity ~1) down to the faint rest state.
-        el.animate([{ opacity: 1 }, { opacity: 0.55 }], {
-          duration: 600,
-          delay: RESOLVE_AT * 1000,
-          easing: EASE.out,
-          fill: "forwards",
-        });
-      }
-    });
-  }, [still, play]);
-
-  const gridW = COLS * CELL + (COLS - 1) * GAP;
-  const chosenCol = CHOSEN % COLS;
-  const chosenRow = Math.floor(CHOSEN / COLS);
-
+// a small set of monochrome line-glyphs so the tiles read as DIFFERENT tools.
+function Glyph({ i }: { i: number }) {
+  const c = {
+    fill: "none",
+    stroke: "#9a9aa1",
+    strokeWidth: 5,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
+  const g = i % 6;
   return (
-    <div
-      ref={ref}
-      style={{
-        position: "absolute",
-        left: "50%",
-        top: 470,
-        transform: "translateX(-50%)",
-        width: gridW,
-        display: "grid",
-        gridTemplateColumns: `repeat(${COLS}, ${CELL}px)`,
-        gap: GAP,
-      }}
-    >
-      {Array.from({ length: TOTAL }).map((_, i) => {
-        const isOne = i === CHOSEN;
-        // ANTI-FLASH: when playing, non-chosen squares start hidden+small and the
-        // WAAPI wave reveals them; when still, they render at their FINAL state.
-        // (The chosen square's outer wrapper still fades in with the wave so it
-        // doesn't pop alone; its inner box owns the resolve scale.)
-        const hiddenStart = !still;
-        return (
-          <div
-            key={i}
-            data-sq={i}
-            style={{
-              position: "relative",
-              width: CELL,
-              height: CELL,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              // start state for the WAAPI wave (overwritten by fill:forwards)
-              opacity: hiddenStart ? 0 : isOne ? 1 : 0.55,
-              transform: hiddenStart ? "scale(0.4)" : "none",
-            }}
-          >
-            {isOne ? (
-              /* solid, slightly larger square — the ONE tool that matters.
-                 (The hand-circle is rendered as a top overlay AFTER the grid so
-                 it paints ON TOP of the neighbouring squares, not behind them.) */
-              <div
-                data-box
-                style={{
-                  width: CELL + 8,
-                  height: CELL + 8,
-                  borderRadius: 12,
-                  background: INK,
-                  boxShadow: "0 18px 40px -18px rgba(0,0,0,0.45)",
-                }}
-              />
-            ) : (
-              <div
-                data-box
-                style={{
-                  width: CELL,
-                  height: CELL,
-                  borderRadius: 10,
-                  background: GRAY,
-                  border: `1px solid ${LINE}`,
-                  // opacity lives on the outer wrapper (animated); keep box solid
-                }}
-              />
-            )}
-          </div>
-        );
-      })}
+    <svg width="46" height="46" viewBox="0 0 46 46" aria-hidden>
+      {g === 0 && <circle cx="23" cy="23" r="13" {...c} />}
+      {g === 1 && <rect x="11" y="11" width="24" height="24" rx="6" {...c} />}
+      {g === 2 && <path d="M23 9 L37 35 L9 35 Z" {...c} />}
+      {g === 3 && (
+        <>
+          <line x1="12" y1="17" x2="34" y2="17" {...c} />
+          <line x1="12" y1="29" x2="27" y2="29" {...c} />
+        </>
+      )}
+      {g === 4 && (
+        <>
+          <line x1="23" y1="11" x2="23" y2="35" {...c} />
+          <line x1="11" y1="23" x2="35" y2="23" {...c} />
+        </>
+      )}
+      {g === 5 && (
+        <>
+          <circle cx="18" cy="18" r="5" {...c} />
+          <circle cx="30" cy="30" r="5" {...c} />
+          <line x1="22" y1="22" x2="26" y2="26" {...c} />
+        </>
+      )}
+    </svg>
+  );
+}
 
-      {/* "one." label beside the hand-circled square — sketchy connector.
-          fades/rises in LAST. Wrapped so cc-* doesn't fight the own transform:
-          the positioned wrapper holds translateY(-50%); the cc-fade rides on an
-          inner plain div. */}
+const oneTile = (
+  <div
+    style={{
+      width: ONE,
+      height: ONE,
+      borderRadius: 34,
+      background: INK,
+      boxShadow: "0 30px 60px -26px rgba(0,0,0,0.55)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <svg width="66" height="66" viewBox="0 0 46 46" aria-hidden>
+      <path
+        d="M13 24 l7 7 l13 -17"
+        fill="none"
+        stroke="#fff"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  </div>
+);
+
+const tileBase: React.CSSProperties = {
+  position: "absolute",
+  left: "50%",
+  top: "50%",
+  width: TILE,
+  height: TILE,
+  marginLeft: -TILE / 2,
+  marginTop: -TILE / 2,
+  borderRadius: 24,
+  background: WHITE,
+  border: `1px solid ${LINE}`,
+  boxShadow: "0 18px 40px -22px rgba(0,0,0,0.4)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+function ToolConverge() {
+  const still = useStill();
+
+  const center: React.CSSProperties = {
+    position: "absolute",
+    left: "50%",
+    top: "50%",
+    width: ONE,
+    height: ONE,
+    marginLeft: -ONE / 2,
+    marginTop: -ONE / 2,
+  };
+
+  if (still) {
+    return (
       <div
         style={{
           position: "absolute",
-          left: chosenCol * (CELL + GAP) + CELL + 56,
-          top: chosenRow * (CELL + GAP) + CELL / 2,
-          transform: "translateY(-50%)",
-          display: "flex",
-          alignItems: "center",
-          gap: 14,
+          left: 0,
+          right: 0,
+          top: 430,
+          height: 460,
         }}
       >
-        <div
-          className="cc-fade"
-          style={{ "--d": `${LABEL_AT}s` } as React.CSSProperties}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            {/* hand-drawn connector tick (wobbly, not a perfect 1px rule) */}
-            <svg
-              width="38"
-              height="16"
-              viewBox="0 0 38 16"
-              aria-hidden
-              style={{ overflow: "visible", flexShrink: 0 }}
-            >
-              <path
-                className="cc-pencil-stroke"
-                pathLength={1}
-                d="M2 9 C 12 5, 22 12, 36 7"
-                fill="none"
-                stroke={INK}
-                strokeWidth={3}
-                strokeLinecap="round"
-              />
-            </svg>
-            <span
-              style={{
-                fontFamily: ui,
-                fontSize: 32,
-                fontWeight: 600,
-                letterSpacing: "-0.02em",
-                color: INK,
-              }}
-            >
-              one.
-            </span>
-          </div>
+        <div style={center}>{oneTile}</div>
+        <div style={{ position: "absolute", left: "50%", top: "50%" }}>
+          <PencilCircle color={INK} size={300} />
         </div>
       </div>
+    );
+  }
 
-      {/* HAND-CIRCLED overlay — rendered LAST + z-indexed so the two scribble
-          loops paint ON TOP of every neighbouring square. Centered on the black
-          square's center. The PencilCircle loops draw themselves in; we delay
-          the draw to ~1.95s (after the one square settles) via --pencil-delay on
-          this ancestor. The own rotate transforms stay on plain divs (the cc-*
-          draw lives inside the SVG paths, never on these wrappers). */}
-      <div
-        style={
-          {
-            position: "absolute",
-            left: chosenCol * (CELL + GAP) + CELL / 2,
-            top: chosenRow * (CELL + GAP) + CELL / 2,
-            width: 0,
-            height: 0,
-            zIndex: 5,
-            pointerEvents: "none",
-            "--pencil-delay": `${PENCIL_AT}s`,
-          } as React.CSSProperties
-        }
+  return (
+    <div
+      style={
+        {
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: 430,
+          height: 460,
+          ["--pencil-delay" as string]: "2.1s",
+        } as React.CSSProperties
+      }
+    >
+      {SCATTER.map((p, i) => (
+        <motion.div
+          key={i}
+          style={tileBase}
+          initial={{ x: p.x, y: p.y, rotate: p.r, opacity: 0, scale: 0.6 }}
+          animate={{
+            x: [p.x, p.x, p.x, 0],
+            y: [p.y, p.y, p.y, 0],
+            rotate: [p.r, p.r, p.r, 0],
+            opacity: [0, 1, 1, 0],
+            scale: [0.6, 1, 1, 0.3],
+          }}
+          transition={{
+            duration: 1.7,
+            delay: 0.5 + i * 0.04,
+            times: [0, 0.16, 0.5, 1],
+            ease: "easeInOut",
+          }}
+        >
+          <Glyph i={i} />
+        </motion.div>
+      ))}
+
+      <motion.div
+        style={center}
+        initial={{ scale: 0.2, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{
+          delay: 1.75,
+          type: "spring",
+          stiffness: 210,
+          damping: 16,
+        }}
       >
-        <div style={{ transform: "rotate(-7deg)" }}>
-          <PencilCircle color={INK} size={208} />
-        </div>
-        <div style={{ transform: "rotate(9deg)" }}>
-          <PencilCircle color={INK} size={238} />
-        </div>
+        {oneTile}
+      </motion.div>
+
+      <div style={{ position: "absolute", left: "50%", top: "50%" }}>
+        <PencilCircle color={INK} size={300} />
       </div>
     </div>
   );
@@ -318,12 +236,7 @@ export default function Slide5() {
         <div className="cc-fade">
           <Eyebrow text="The trap" />
         </div>
-        <h1
-          style={{
-            ...head(88),
-            padding: "0 90px",
-          }}
-        >
+        <h1 style={{ ...head(88), padding: "0 90px" }}>
           <Letters start={0.12} step={0.022}>
             You don't need <span style={{ color: MUTED }}>50 tools.</span>
           </Letters>
@@ -339,16 +252,10 @@ export default function Slide5() {
           <Letters start={0.5} step={0.03}>
             You need
           </Letters>{" "}
-          {/* the oversized "one" gets its own beat — plain inline-block wrapper
-              owns the cc-pop (the <U> word itself is position:relative for the
-              underline, so we DON'T put cc-pop directly on it). */}
           <span
             className="cc-pop"
             style={
-              {
-                display: "inline-block",
-                "--d": "0.92s",
-              } as React.CSSProperties
+              { display: "inline-block", "--d": "0.92s" } as React.CSSProperties
             }
           >
             <span
@@ -362,7 +269,6 @@ export default function Slide5() {
               <U thickness={13}>one</U>
             </span>
           </span>
-          {/* the period punches in AFTER "one" has popped + settled */}
           <span
             className="cc-pop"
             style={
@@ -374,29 +280,27 @@ export default function Slide5() {
         </h1>
       </div>
 
-      {/* the 50-square field (JS-choreographed child; frozen → final state) */}
-      <SquareField />
+      {/* the convergence visual (framer child; frozen → final one-tile + circle) */}
+      <ToolConverge />
 
       {/* body line */}
-      <Center pad={120}>
-        <div
-          className="cc-rise-sm"
-          style={
-            {
-              position: "absolute",
-              bottom: 132,
-              left: 0,
-              right: 0,
-              textAlign: "center",
-              "--d": "2.4s",
-            } as React.CSSProperties
-          }
-        >
-          <p style={{ ...sub(34), padding: "0 120px" }}>
-            And the patience to actually use it.
-          </p>
-        </div>
-      </Center>
+      <div
+        className="cc-rise-sm"
+        style={
+          {
+            position: "absolute",
+            bottom: 120,
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            "--d": "2.7s",
+          } as React.CSSProperties
+        }
+      >
+        <p style={{ ...sub(34), padding: "0 120px" }}>
+          And the patience to actually use it.
+        </p>
+      </div>
     </Slide>
   );
 }
