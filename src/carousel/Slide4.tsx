@@ -1,46 +1,109 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Slide, Eyebrow, head, ui, INK_D, U, Letters, useStill } from "./kit";
 
-/* ANIMATION (play-then-freeze — the REFRAME, made tangible):
+/* ANIMATION (play-then-freeze — the REFRAME as a casino lock):
    1. Eyebrow + headline roll in (Letters). "Nobody's ahead." rises; its WHITE
       pencil <U> draws after it lands.
-   2. THE VISUAL — a STANDINGS card. The rows fade up; the rank numbers come in as
-      a normal ladder (1, 2, 3) and then ROLL — every rank flips to 1. The board
-      everyone fears doesn't exist: it's a tie, Day 1, nobody ahead.
-   FROZEN (useStill): every rank shows 1, rows settled — the final tie. */
+   2. THE VISUAL — a STANDINGS card. Each rank is a SLOT-MACHINE reel: digits blur
+      past fast in 3D, decelerate, and LOCK on 1 — one row after another, each with
+      a bloom flash. Every rank lands on 1: a tie, Day 1, nobody ahead.
+   FROZEN (useStill): each reel shows 1, settled — the final tie. */
 
 const ROWS = [
-  { name: "You", from: 2, you: true },
-  { name: "The “experts”", from: 1, you: false },
-  { name: "Everyone else", from: 3, you: false },
+  { name: "You", you: true },
+  { name: "The “experts”", you: false },
+  { name: "Everyone else", you: false },
 ];
 
-const RH = 52; // rank roll cell height
+const RH = 56; // reel cell height
+const SPIN = 26; // how many digits blur past before locking
 
-function RankRoll({ from, delay }: { from: number; delay: number }) {
+function genStrip(): number[] {
+  const arr = [1]; // index 0 = the lock value
+  for (let k = 0; k < SPIN; k++) arr.push(((Math.random() * 9) | 0) + 1);
+  return arr;
+}
+
+const numStyle: React.CSSProperties = {
+  height: RH,
+  lineHeight: `${RH}px`,
+  width: 54,
+  textAlign: "center",
+  fontFamily: ui,
+  fontSize: 46,
+  fontWeight: 600,
+  letterSpacing: "-0.02em",
+  color: "#fff",
+  fontVariantNumeric: "tabular-nums",
+};
+
+function SlotReel({ delay }: { delay: number }) {
   const still = useStill();
-  const num: React.CSSProperties = {
-    height: RH,
-    lineHeight: `${RH}px`,
-    fontFamily: ui,
-    fontSize: 42,
-    fontWeight: 600,
-    letterSpacing: "-0.02em",
-    color: "#fff",
-    textAlign: "center",
-    fontVariantNumeric: "tabular-nums",
-  };
-  if (still || from === 1) return <div style={{ ...num, width: 40 }}>1</div>;
+  const [cells] = useState(genStrip);
+  if (still) return <div style={numStyle}>1</div>;
+  const total = (cells.length - 1) * RH; // strip travel: last cell → cell 0 ("1")
   return (
-    <div style={{ height: RH, width: 40, overflow: "hidden" }}>
-      <motion.div
-        initial={{ y: 0 }}
-        animate={{ y: -RH }}
-        transition={{ delay, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+    <div
+      style={{
+        position: "relative",
+        width: 54,
+        height: RH,
+        // a touch of 3D so the reel reads like a real wheel
+        transform: "perspective(900px) rotateX(8deg)",
+      }}
+    >
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          height: RH,
+          width: 54,
+          overflow: "hidden",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent 0%, #000 32%, #000 68%, transparent 100%)",
+          maskImage:
+            "linear-gradient(to bottom, transparent 0%, #000 32%, #000 68%, transparent 100%)",
+        }}
       >
-        <div style={num}>{from}</div>
-        <div style={num}>1</div>
-      </motion.div>
+        <motion.div
+          initial={{ y: -total, filter: "blur(0px)" }}
+          animate={{
+            y: 0,
+            filter: ["blur(0px)", "blur(11px)", "blur(11px)", "blur(0px)"],
+          }}
+          transition={{
+            y: { delay, duration: 1.7, ease: [0.08, 0.85, 0.12, 1] },
+            filter: { delay, duration: 1.7, times: [0, 0.12, 0.78, 1] },
+          }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            willChange: "transform, filter",
+          }}
+        >
+          {cells.map((d, i) => (
+            <div key={i} style={numStyle}>
+              {d}
+            </div>
+          ))}
+        </motion.div>
+      </div>
+      {/* bloom flash behind the digit as it locks */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: [0, 0, 0.9, 0], scale: [0.5, 0.5, 1.5, 2.2] }}
+        transition={{ delay: delay + 1.42, duration: 0.85, times: [0, 0.25, 0.5, 1] }}
+        style={{
+          position: "absolute",
+          inset: -12,
+          zIndex: 0,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(closest-side, rgba(255,255,255,0.6), rgba(255,255,255,0))",
+          pointerEvents: "none",
+        }}
+      />
     </div>
   );
 }
@@ -81,7 +144,7 @@ export default function Slide4() {
         </div>
       </div>
 
-      {/* the standings card — everyone ranks 1 */}
+      {/* the standings card — every reel locks on rank 1 */}
       <div
         className="cc-float"
         style={
@@ -91,7 +154,7 @@ export default function Slide4() {
             left: "50%",
             marginLeft: -360,
             width: 720,
-            "--fdelay": "2.6s",
+            "--fdelay": "4s",
             "--fdur": "5.6s",
           } as React.CSSProperties
         }
@@ -160,7 +223,7 @@ export default function Slide4() {
                     : "1px solid transparent",
                 }}
               >
-                <RankRoll from={r.from} delay={1.55 + i * 0.12} />
+                <SlotReel delay={1.5 + i * 0.45} />
                 <div
                   style={{
                     width: 46,
@@ -168,9 +231,7 @@ export default function Slide4() {
                     borderRadius: 999,
                     flexShrink: 0,
                     background: r.you ? "#fff" : "rgba(245,245,247,0.10)",
-                    border: r.you
-                      ? "none"
-                      : "2px solid rgba(245,245,247,0.45)",
+                    border: r.you ? "none" : "2px solid rgba(245,245,247,0.45)",
                   }}
                 />
                 <span
