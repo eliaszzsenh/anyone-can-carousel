@@ -1,15 +1,24 @@
 ---
 name: carousel
 description: >-
-  Build an animated 1080x1080 Instagram carousel in this React repo. Use when the
-  user asks to make a carousel, slides, an Instagram/IG post, a "swipe" post, or to
-  turn an idea/script into animated square slides. The user screen-records the result.
+  Build an animated 1080x1080 Instagram carousel in this React repo. Use whenever the
+  user asks to make a carousel, slides, an Instagram/IG/"swipe" post, or to turn an
+  idea/script into animated square slides. Also the default mode for this repo: greet in
+  carousel mode and run the intake. The user screen-records the result; there is no server.
 ---
 
-# Carousel
+# Carousel mode
 
-This repo is the front end for animated 1080x1080 Instagram carousels (React + Vite).
-Full reference is in `AGENTS.md` at the repo root, read it first.
+This repo is the front end for animated 1080x1080 Instagram carousels (React + Vite). The
+full manual is **[AGENTS.md](../../../AGENTS.md)** at the repo root, read it before editing
+motion. The proactive greeting is in **[CLAUDE.md](../../../CLAUDE.md)**.
+
+## On the first message: run the intake
+
+Greet in "carousel mode" and ask, in one compact block (one-line answers fine):
+1. Topic / idea  2. How many slides (default 8)  3. The CTA  4. Keep default look or
+change colors/font/vibe  5. Any logos to feature / effects wanted.
+Then write the script in plain text and get a yes BEFORE coding.
 
 ## Run it
 
@@ -20,23 +29,21 @@ npm run dev      # http://localhost:5173
 
 ## What you edit
 
-- `src/carousel/Slide1.tsx … Slide8.tsx` — the slides (the content). THIS is the work.
-- `src/App.tsx` — the array that defines which slides show and in what order.
-- `src/carousel/kit.tsx` — the design system + animation engine. Read it; rarely edit.
+- `src/carousel/SlideN.tsx` — the slides (the content). THIS is the work. Add/remove/
+  reorder via the `slides` array in `src/App.tsx`.
+- `src/carousel/kit.tsx` — design tokens + animation engine. Read it; rarely edit.
+- `src/carousel/icons.tsx` — real brand logos as SVG (+ how to add any).
 
-## Always, in order
+## The laws (don't break unless the user overrides)
 
-1. Write the 8-beat script in plain text first (hook · tension · truth · reframe · the
-   one thing · proof/who · takeaway · CTA). Confirm with the user before coding.
-2. Edit the slide components to match, reusing kit helpers: `head`, `sub`, `Eyebrow`,
-   `U`, `Letters`, `PlayCard`, `PencilCircle`.
-3. Keep the "base style = final state" rule (animations only run under `.carcar-play`),
-   or stills break.
-4. Tell the user to open the **Record** tab and screen-record (F11 + a screen recorder).
+- **SVG, never emoji** — brands and glyphs come from `icons.tsx` (it documents how to add
+  any logo from simpleicons.org / svgl.app / lucide.dev). Emojis only if asked.
+- **Monochrome** (ink + grey + white), big tight headlines (80–100px, tracking -0.03em).
+- **Base style = final state** — entry animations only run under `.carcar-play`, or the
+  still/export breaks.
+- **Small, staggered motion** — text appears in reading order, never all at once.
 
 ## The signature move: `<Letters>`
-
-Wrap a headline so each letter rises in with a blur bloom, staggered:
 
 ```tsx
 <h1 style={{ ...head(92) }}>
@@ -45,10 +52,9 @@ Wrap a headline so each letter rises in with a blur bloom, staggered:
 ```
 
 `start` = delay before the first letter; `step` = per-letter stagger (smaller for long
-lines). It keeps words intact and lets `<U>` underlines draw in. See AGENTS.md →
-"The text effect" and "The three motion laws" for everything else.
+lines). See AGENTS.md for the engine, adding effects, restyling, and the SVG rules.
 
-## Style defaults
+## Export
 
-Monochrome (ink + grey + white), big headlines (80-100px), tight tracking (-0.03em).
-The motion feel is the user's signature, design it with them, don't blindly clone.
+Tell the user to open the **Record** tab → Enter record mode → F11 → screen-record the
+square. The recording is the export; there is no server.

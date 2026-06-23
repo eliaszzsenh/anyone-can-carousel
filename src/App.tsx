@@ -186,7 +186,7 @@ export default function App() {
             cursor: "pointer",
           }}
         >
-          ✕ Exit
+          Exit
         </button>
         <div
           style={{
@@ -372,7 +372,7 @@ export default function App() {
               cursor: "pointer",
             }}
           >
-            ▶ Enter record mode
+            Enter record mode
           </button>
         </div>
       )}
