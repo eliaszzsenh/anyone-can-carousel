@@ -57,19 +57,34 @@ export default function Slide8() {
               } as React.CSSProperties
             }
           >
-            <img
-              src="/profile.jpg"
-              alt="Your name"
+            {/* PLACEHOLDER avatar — no real photo ships with the repo.
+                To use YOUR face: drop a square photo at public/profile.jpg, then
+                replace this whole <div> with:
+                  <img src="/profile.jpg" alt="you" style={{ width:156, height:156,
+                    borderRadius:"50%", objectFit:"cover", display:"block",
+                    border:"1px solid rgba(0,0,0,0.08)" }} />
+                Don't want a face at all? Delete this entire photo block. */}
+            <div
               style={{
                 width: 156,
                 height: 156,
                 borderRadius: "50%",
-                objectFit: "cover",
-                objectPosition: "center 32%",
-                display: "block",
+                display: "flex",
+                alignItems: "flex-end",
+                justifyContent: "center",
+                overflow: "hidden",
+                background: "#ececee",
                 border: "1px solid rgba(0,0,0,0.08)",
               }}
-            />
+            >
+              <svg width="96" height="96" viewBox="0 0 24 24" aria-hidden>
+                <circle cx="12" cy="8.5" r="4" fill="#b9b9bf" />
+                <path
+                  d="M3.5 22c0-4.7 3.8-8 8.5-8s8.5 3.3 8.5 8z"
+                  fill="#b9b9bf"
+                />
+              </svg>
+            </div>
             <PencilCircle color={INK} size={290} />
           </div>
         </div>

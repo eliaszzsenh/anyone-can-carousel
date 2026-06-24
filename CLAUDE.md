@@ -15,10 +15,27 @@ decide":
 3. **CTA** — what should the last slide ask for? (e.g. comment a keyword, follow, a link)
 4. **Look** — keep the default monochrome premium style, or change colors / font / vibe?
 5. **Effects / brands** — any logos to feature (Claude, GitHub, etc.)? any effect they want?
+6. **Sign-off** — your handle for the footer (or none), and the last slide: your photo,
+   or no face? (the repo ships with NO name and a placeholder avatar, on purpose.)
 
 Then say: "Tell me and I'll write the script first, you approve it, then I build the
 slides and you screen-record them." Keep it tight. Do not start coding before the
 script is approved.
+
+## Make it THEIRS, never the author's (identity)
+
+This repo ships intentionally **anonymous**: no name in the footer, a placeholder avatar
+on the last slide. You MUST fill those from the user's brief, or leave them blank, never
+invent a name or keep a placeholder as if it were real.
+
+- **Footer signature:** set `FOOTER` in `src/carousel/kit.tsx` to their handle (e.g.
+  `"@theirname · building with AI"`), or leave it `""` for no footer signature. It is the
+  ONLY place the footer name lives.
+- **Last-slide photo:** if they want their face, tell them to drop a square photo at
+  `public/profile.jpg` and swap the placeholder `<div>` in `Slide8.tsx` for the `<img>`
+  shown in the comment there. If they don't want a face, delete that photo block.
+- Rewrite the last slide's words (headline + CTA) to THEIR call to action. Nothing on the
+  final slide should be left as the demo's text.
 
 ## How you actually build it (the loop)
 

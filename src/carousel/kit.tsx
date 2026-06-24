@@ -50,6 +50,11 @@ export const LINE_D = "rgba(255,255,255,0.12)";
 export const ui =
   "'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Inter Tight', 'Inter', sans-serif";
 
+// ── YOUR footer signature. Set it to your handle (e.g. "@yourname · building
+// with AI") or leave it "" for no signature at all. This is the ONLY place the
+// footer name lives, it is never hardcoded per slide.
+export const FOOTER = "";
+
 // shared easing language — every slide uses these so the whole carousel feels
 // like one hand. `out` = smooth settle (default). `pop` = slight overshoot.
 // `io` = symmetric in/out for travel.
@@ -118,22 +123,33 @@ const TOTAL = 8;
 export function Foot({ n, dark = false }: { n: number; dark?: boolean }) {
   const c = dark ? MUTED_D : "rgba(29,29,31,0.5)";
   const dot = dark ? "rgba(245,245,247,0.3)" : "rgba(29,29,31,0.3)";
+  // render the left signature only if FOOTER is set (so a fresh repo has no name)
+  const sig = FOOTER.includes(" · ") ? (
+    <>
+      {FOOTER.split(" · ")[0]} <span style={{ color: dot }}>·</span>{" "}
+      {FOOTER.split(" · ").slice(1).join(" · ")}
+    </>
+  ) : (
+    FOOTER
+  );
   return (
     <>
-      <div
-        style={{
-          position: "absolute",
-          bottom: 56,
-          left: 64,
-          fontFamily: ui,
-          fontSize: 23,
-          fontWeight: 600,
-          letterSpacing: "0.01em",
-          color: c,
-        }}
-      >
-        Eliasz <span style={{ color: dot }}>·</span> building with AI
-      </div>
+      {FOOTER ? (
+        <div
+          style={{
+            position: "absolute",
+            bottom: 56,
+            left: 64,
+            fontFamily: ui,
+            fontSize: 23,
+            fontWeight: 600,
+            letterSpacing: "0.01em",
+            color: c,
+          }}
+        >
+          {sig}
+        </div>
+      ) : null}
       <div
         style={{
           position: "absolute",

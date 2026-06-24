@@ -49,7 +49,8 @@ src/
     icons.tsx              real brand logos as inline SVG (+ how to add any). USE THIS.
     Slide1.tsx … Slide8.tsx   the slides — THIS is what you edit / create.
 public/
-  profile.jpg              the photo on the final slide (user replaces with theirs)
+  (empty)                  drop YOUR square profile.jpg here for the final-slide photo;
+                           ships empty — Slide8 shows a placeholder avatar until you do
 ```
 
 Each `SlideN.tsx` is a self-contained component. The carousel is the array in
@@ -104,17 +105,22 @@ All tokens live at the top of `src/carousel/kit.tsx`:
 WHITE "#FFFFFF"  GRAY "#F5F5F7"  INK "#1D1D1F"  MUTED "#6E6E73"  LINE …
 DARK  "#202224"  INK_D "#F5F5F7" MUTED_D …                      (dark-slide variants)
 ui    = the font stack (SF Pro → Inter Tight → Inter fallback)
+FOOTER = your footer signature ("" = none). Inter Tight/Inter are pinned in index.html
 EASE  = { out, pop, io }   shared easing language
 head(size)  sub(size)      headline + body style helpers
 ```
 
 - **Recolor the whole carousel:** change `INK` / `GRAY` / `WHITE` (and the `DARK` set for
   dark slides). Every slide imports these, so one edit reskins all of them.
-- **Change the font:** edit `ui`. To use a Google font, add its `<link>` in `index.html`
-  and put the family first in `ui`.
-- **The signature footer** ("Eliasz · building with AI" + "01 / 08") is the `Foot`
-  component in `kit.tsx`, change the name there, or pass `foot={false}` to a `<Slide>` to
-  hide it on that slide (the CTA slide usually hides it).
+- **Fonts are pinned** in `index.html` (Inter Tight + Inter via Google Fonts) so the
+  carousel looks identical on every machine. If you change the font: add the new family's
+  `<link>` in `index.html` AND put it first in `ui`. Don't rely on a system font being
+  installed, or a fresh clone renders in the wrong typeface.
+- **The signature footer** is `FOOTER` in `kit.tsx` (ships as `""` = no signature). Set it
+  to the user's handle (e.g. `"@them · building with AI"`); the `·` is auto-styled. The
+  `Foot` component draws it on the left + the "01 / 08" page number on the right. Pass
+  `foot={false}` to a `<Slide>` to hide the whole footer (the CTA slide usually does).
+  Never hardcode a name into a slide.
 - **Headline feel:** `head(size)` is weight 600, tracking `-0.035em`, line-height 1.02.
   Big + tight is what makes type read "Apple" not "default". Keep headlines 80–100px.
 
@@ -262,7 +268,9 @@ good, but it's not a cage. If the user wants their own style, change it cleanly:
   drop `<PencilCircle>`. The carousel still works.
 - **Different motion personality:** tune `Letters` `step`, or design new effects (section
   above). Slower/larger = playful; faster/smaller = refined.
-- **Their face on the last slide:** drop a square image at `public/profile.jpg`.
+- **Their face on the last slide:** drop a square image at `public/profile.jpg`, then in
+  `Slide8.tsx` swap the placeholder `<div>` for the `<img>` shown in the comment there.
+  No face? Delete that photo block. Don't ship anyone else's photo.
 
 Tell the user what you changed and why, then keep the whole set consistent — one palette,
 one font, one motion feel across all slides.
@@ -278,5 +286,8 @@ or OBS), then crop to 1:1 and post. There is no server export, the recording IS 
 
 ## The final slide photo
 
-The last slide can show a circular photo from `public/profile.jpg` framed by a
-`PencilCircle`. Tell the user to drop their own square photo there.
+The last slide shows a **placeholder avatar** by default (the repo ships with no real
+photo). To use the user's face: they drop a square `public/profile.jpg`, then you swap the
+placeholder `<div>` in `Slide8.tsx` for the `<img src="/profile.jpg">` shown in the comment
+right there, framed by the `PencilCircle`. If they don't want a face, delete that block.
+Never ship someone else's photo or name, this repo is meant to become the user's.
